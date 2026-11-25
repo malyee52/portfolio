@@ -1,0 +1,319 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>퍼펙트 매니지먼트 · 게임 기획</title>
+<meta name="description" content="한국 프로야구 단장 시뮬레이션 퍼펙트 매니지먼트의 기획·운영·QA">
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <p class="kicker">메인 프로젝트 · 개인</p>
+    <h1>퍼펙트 매니지먼트</h1>
+    <p class="lead">한국 프로야구 구단 단장 시뮬레이션 <b>퍼펙트 매니지먼트</b>를 2026년 10월부터 만들고 있습니다. 무엇을 만들지, 어떤 규칙이 재미있는지, 어디까지 허용할지를 제가 정했고, 코드와 측정은 제가 설계·운영한 AI 작업 조직이 맡았습니다. 이 문서는 그 결정들과 근거 숫자를 모은 것입니다.</p>
+    <div class="who">
+      <span><b>GitHub</b> <a href="https://github.com/malyee52/kbo-gm">github.com/malyee52/kbo-gm</a></span>
+      <span><b>기준</b> origin/main <code>f69fca6</code> (2026-11-12, PR #164)</span>
+    </div>
+    <div class="subtoc"><a href="#overview">1 게임 개요</a><a href="#role">2 내가 한 일</a><a href="#org">3 제작 방식</a><a href="#qa">4 QA·TC</a><a href="#links">5 링크</a></div>
+  </div>
+</header>
+<nav class="toc" aria-label="이동">
+  <div class="wrap">
+    <a class="back" href="../index.html">← 메인으로</a>
+    <span class="sep"></span>
+    <a class="tab on" href="perfect-management.html" aria-current="page">퍼펙트 매니지먼트</a>
+    <a class="tab" href="rushitadel.html">Rushitadel</a>
+    <a class="tab" href="trash-boy.html">쓰레기 집게 소년</a>
+    <button id="themeBtn" type="button" aria-label="밝게/어둡게 바꾸기">테마</button>
+  </div>
+</nav>
+<main class="wrap">
+<!-- 1 개요 -->
+<section id="overview">
+  <h2><span class="no">1</span>퍼펙트 매니지먼트는 어떤 게임인가</h2>
+  <p class="sub">옛 이름은 "KBO 단장 게임"입니다. 저장소 이름(<code>kbo-gm</code>)과 일부 화면 문구에는 아직 옛 이름이 남아 있습니다.</p>
+
+  <div class="grid g3">
+    <div class="card"><b>무엇</b><p>KBO 실제 선수·구단 기록으로 하는 웹 단장 시뮬레이션입니다. 1982~2026년 가운데 시작 해와 구단을 골라 정규시즌·가을야구·오프시즌을 거치며 여러 해를 이어 갑니다. 수익을 내지 않는 실험작이고 브라우저만으로 돌아갑니다.</p></div>
+    <div class="card"><b>누구를 위해</b><p>야구를 보며 "단장 나와!"를 외쳐 본 팬. 초보도 읽을 수 있는 화면, 기록을 좋아하는 팬이 알아볼 숫자, 세부를 파는 하드코어 팬이 좋아할 깊이를 함께 목표로 두었습니다.</p></div>
+    <div class="card"><b>핵심 재미</b><p><b>답지를 들고도 시험에서 떨어질 수 있을까.</b> 플레이어는 누가 대성하는지 역사를 알지만, 천장·성장 성향·성장 시기는 숨어 있고 화면에는 스카우트 추측 범위만 보입니다. 알고 뽑아도 육성·부상·돈 관리에 실패하면 무너집니다.</p></div>
+  </div>
+
+  <h3>숫자로 본 제작</h3>
+  <div class="grid g4">
+    <div class="card stat"><div class="n">36일</div><div class="l">첫 커밋 → PR #164</div><div class="d">2026-10-08 → 2026-11-12</div></div>
+    <div class="card stat"><div class="n">861</div><div class="l">커밋 (origin/main)</div><div class="d">병합 커밋 포함, 그중 659개에 Claude 공동 저자 표시</div></div>
+    <div class="card stat"><div class="n">162건</div><div class="l">PR 병합</div><div class="d">마지막 #164</div></div>
+    <div class="card stat"><div class="n">94,006</div><div class="l">TS/TSX 줄 (479개 파일)</div><div class="d">게임 코드 <code>src/</code> 61,968줄</div></div>
+    <div class="card stat"><div class="n">1,345</div><div class="l">자동 시험 통과 (PR #164)</div><div class="d">시험 파일 179개, <code>it/test</code> 선언 1,263개</div></div>
+    <div class="card stat"><div class="n">109</div><div class="l">검증·변환 도구 파일</div><div class="d"><code>tools/</code> 폴더</div></div>
+    <div class="card stat"><div class="n">766줄</div><div class="l">사용자 결정 기록</div><div class="d">날짜별로 적은 <code>결정기록.md</code></div></div>
+    <div class="card stat"><div class="n">217</div><div class="l">테스트 케이스 (TC)</div><div class="d">기능 영역 19개, 4절</div></div>
+  </div>
+  <p class="note">커밋·PR·줄 수는 <code>git</code>으로 origin/main <code>f69fca6</code>에서 직접 셌습니다. 시험 1,345개는 PR #164 병합 때 전체 시험 실행 기록이고, 파일·선언 수는 이번에 시험을 돌리지 않고 파일만 센 값입니다 (<code>it.each</code>는 1개로 셈). 결정 기록은 저장소에 커밋하지 않는 로컬 문서입니다.</p>
+
+  <h3>화면</h3>
+  <figure>
+    <img src="../assets/screen-briefing.jpg" alt="브리핑 홈 화면: 다음 경기, 순위, 전력 변화, 소식" loading="lazy">
+    <figcaption>브리핑 홈. 결정이 필요한 일은 "결정함"에 모으고, 홈에는 다음 경기·순위·전력 변화·소식만 둡니다. 구단은 글자와 팀 색으로만 표현합니다 (로고·유니폼·선수 사진 없음).</figcaption>
+  </figure>
+  <div class="grid g2">
+    <figure>
+      <img src="../assets/screen-trade.jpg" alt="트레이드 후보 표: 다른 구단 선수 능력이 50~65 같은 범위로 보임" loading="lazy">
+      <figcaption>트레이드 후보 표. 다른 구단 선수의 능력은 "컨 50~65" 같은 추측 범위로만 보입니다. 스카우트에 투자하면 범위가 좁아집니다.</figcaption>
+    </figure>
+    <figure>
+      <img src="../assets/screen-command.jpg" alt="직접 지휘 경기 화면: 공 단위 중계와 작전" loading="lazy">
+      <figcaption>직접 지휘. 단장이지만 손이 근질거리면 그날 경기를 공 하나 단위로 지휘할 수 있습니다. 던진 공은 되돌릴 수 없습니다.</figcaption>
+    </figure>
+  </div>
+  <p class="note">화면은 2026-11-05 무렵 개발 판 캡처입니다 (이전 포트폴리오 PPT에서 재사용).</p>
+</section>
+
+<!-- 2 내가 한 일 -->
+<section id="role">
+  <h2><span class="no">2</span>내가 한 일</h2>
+  <p class="sub">코드는 대부분 AI가 썼습니다. 제가 한 일은 방향·규칙·결정·플레이 검수, 그리고 그 일을 돌리는 AI 조직의 설계와 운영입니다.</p>
+
+  <div class="tablewrap">
+    <table>
+      <thead><tr><th>누가</th><th>한 일</th></tr></thead>
+      <tbody>
+        <tr><td><b>나</b></td><td>무엇을 만들지, 어떤 규칙이 재미있는지, 어디까지 허용할지 결정. 직접 플레이하고 어색한 곳을 지적. 데이터·실존 인물에 대한 금지선. AI 조직 구성과 운영 규칙.</td></tr>
+        <tr><td><b>AI 코디네이터</b></td><td>일 나누기, 작업 카드 쓰기, 결과 확인, 병합, 보고. 결정이 필요하면 원인과 선택지 ①②③, 추천을 붙여 저에게 물음.</td></tr>
+        <tr><td><b>AI 직원</b></td><td>코드, 자동 시험, 측정 도구, 기획 문서 초안, 자료 조사, 이미지 시안.</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="note">결정 방식: AI가 원인과 선택지, 추천을 내면 제가 하나씩 고릅니다. 결정 기록 766줄에는 추천과 다르게 고른 경우도 "추천과 다름"으로 남아 있습니다.</p>
+
+  <h3>결정 사례: 문제 → 결정 → 결과</h3>
+
+  <article class="case">
+    <h3>① 숨겨진 특수능력을 공개 스킬로 → 다시 명예 칭호로</h3>
+    <div class="meta">2026-10-21 → 10-26 · 정보 설계</div>
+    <dl class="pdr">
+      <dt class="p">문제</dt><dd>선수에게 숨겨진 특수능력이 있었지만 플레이어는 볼 수 없었습니다. 10-21에 "유저도 알 수 있게" 숨김 능력을 없애고 공개 능력 하나로 합치기로 했고, 획득 경로와 실존 선수 약점까지 기획이 진행됐습니다.</dd>
+      <dt class="d">결정</dt><dd>10-26, 스킬 기획을 전부 취소하고 <b>능력에 영향이 없는 명예 칭호</b>로 바꿨습니다. 칭호는 기록·타이틀·커리어로 붙는 이름표이고 선수 화면·소식에만 보입니다. 그 해는 "현 홈런왕", 다음 해부터는 "홈런왕 ×2"처럼 횟수로 남깁니다. 레전드 별명도 아주 어려운 조건을 채우면 얻는 최상위 칭호로 넣었습니다 (기획 직원 추천 "기록 칭호만 먼저"와 다르게 결정).</dd>
+      <dt class="r">결과</dt><dd>스킬은 밸런스 영향이 커서 나중으로 미루고, 칭호는 효과 없이 바로 넣을 수 있었습니다. 취소한 스킬 기획은 브랜치에 기록으로 남겨 다시 할 때 참고합니다. 숨은 능력 다섯 개(타구 억제·사구·부상 경향·회복력·기복)는 짐작 문구로만 보이게 유지했습니다: "유저가 다 보는 건 재미없다".</dd>
+    </dl>
+  </article>
+
+  <article class="case">
+    <h3>② UI 대개편: 정보 구조는 배우고 그림은 베끼지 않는다</h3>
+    <div class="meta">2026-10-22 · UI·화면 규칙</div>
+    <dl class="pdr">
+      <dt class="p">문제</dt><dd>기능이 먼저 쌓인 화면을, 처음 하는 사람과 기록을 파는 팬이 함께 읽을 수 있는 구조로 다시 짜야 했습니다.</dd>
+      <dt class="d">결정</dt><dd>목표를 "초보자도 보기 편하고, 야구 팬이 알 수 있고, 세부를 좋아하는 팬도 좋아할 UI"로 정하고, 대분류 메뉴 → 세부 화면 → 메인 화면 순서로 위에서부터 다시 짰습니다. Football Manager·OOTP의 <b>정보 구조</b>(메뉴 묶음, 소식 중심 홈, 탭 선수 상세)는 참고하되 그림·아이콘·색 배합·고유 명칭은 베끼지 않는다는 선을 그었습니다. AI가 그린 시안 가운데 "결정 브리핑" 안을 골랐습니다.</dd>
+      <dt class="r">결과</dt><dd>브리핑·전력·영입·시즌·경영·아카이브 6개 대분류와 결정함 구조. 같은 날 정한 화면 규칙 두 가지도 지금까지 지킵니다.
+        <ul class="tight">
+          <li>수비 포지션은 화면에서 영문 약자(C 1B 2B 3B SS LF CF RF DH)로 통일. 대화·문서는 한글 그대로.</li>
+          <li>바뀌는 수치는 늘 <span class="ba">전 → 후</span>로 보여 줌. "그냥 띡 보여주면 유저가 얼마나 변했는지를 모르잖아." 첫해처럼 '전' 값이 게임 밖에 있으면 실제 기록 값(예: 2026 반발계수)을 끌어와 채웁니다.</li>
+        </ul></dd>
+    </dl>
+  </article>
+
+  <article class="case">
+    <h3>③ 유료 데이터는 원본이 보이지 않는 것이 기준</h3>
+    <div class="meta">2026-10-21 → 10-24 · 데이터 원칙</div>
+    <dl class="pdr">
+      <dt class="p">문제</dt><dd>능력치 정밀도를 높이려고 유료 기록 사이트(하드힛)의 자료를 쓰기로 했습니다. 약관은 비상업적 인용을 허용하지만 자동 대량 수집은 금지하고, 유료 회원 자료를 어디까지 공개해도 되는지가 문제였습니다.</dd>
+      <dt class="d">결정</dt><dd>자료는 제가 직접 손으로 받고 AI가 계정으로 내려받지 않게 했습니다. 원본 CSV와 선수별 가공 파일은 저장소에 넣지 않고 git 기록에서도 지웠습니다. 기준은 <b>"원본 값이 보이지 않는 것"</b>으로 정리해, 합산·비율·게임 값 같은 가공값만 배포합니다. 출처와 원문 링크, 비상업적 이용은 정보 화면과 README에 적습니다.</dd>
+      <dt class="r">결과</dt><dd>같은 원칙으로 실존 선수 규칙도 정했습니다: 로고·유니폼·사진을 쓰지 않고, 범죄·약물·징계·사생활 같은 극단적 부정 사건은 가상 선수에게만 넣으며, 부상·슬럼프·연봉 갈등 같은 일상 사건은 실존 선수에게도 넣습니다 (10-22). 실명 권리와 공개 범위 검토는 아직 남은 일로 적어 두었습니다.</dd>
+    </dl>
+  </article>
+
+  <article class="case">
+    <h3>④ 구단의 얼굴이 왜 시장에 나와 있죠? (프랜차이즈 스타)</h3>
+    <div class="meta">2026-11-05·06 · 트레이드 AI 밸런스 · PR #160</div>
+    <dl class="pdr">
+      <dt class="p">문제</dt><dd>AI 구단이 자기 프랜차이즈 스타를 너무 쉽게 트레이드 시장에 내놓았습니다. 잰 값은 <span class="ba">시즌당 2.31건</span>, 제안 10건 중 3건이 스타였습니다. AI의 평가 함수가 재직 기간을 전혀 보지 않았기 때문입니다. 제가 남긴 지시는 "현실에서 거의 일어나지 않는 일이잖아".</dd>
+      <dt class="d">결정</dt><dd>금지가 아니라 <b>값</b>으로 막았습니다. 재직·구단 WAR·칭호로 A(구단의 얼굴)·B(프랜차이즈 스타) 등급을 판정하고 가산치를 붙입니다. 판정에 칭호를 쓰기로 해서 "칭호는 AI에 안 쓴다" 규칙을 바꿨습니다 (기획 직원 추천과 다름). 처음 40런으로는 모자라 <span class="ba">40 → 120런</span>으로 올렸고, 그래도 A 선수 요구에 AI가 값을 부르는 비율이 43%여서 목표 30%를 고쳐 받아들였습니다.</dd>
+      <dt class="r">결과</dt><dd>AI가 먼저 내놓는 스타 거래 <span class="ba">2.31 → 0.20건</span>, 남은 것은 모두 B 등급. 우리에게 온 A 제안 <span class="ba">52 → 0건</span>. 승률 격차와 FA 흐름은 그대로였습니다.</dd>
+    </dl>
+  </article>
+
+  <article class="case">
+    <h3>⑤ 타율이 떨어진 범인은 외국인 투수 재계약이었다</h3>
+    <div class="meta">2026-11-06 → 11-10 · 원인 찾기 · PR #159·#161·#162</div>
+    <dl class="pdr">
+      <dt class="p">문제</dt><dd>외국인 선수가 평균 5년 넘게 머물렀습니다 (실제 KBO 1.57시즌). 재계약 기준을 고치고 개발 판을 합치자 이번엔 리그 타율이 <span class="ba">.261 → .254</span>로 떨어졌습니다.</dd>
+      <dt class="d">결정</dt><dd>쉬운 답(타율 보정값 키우기) 대신 기능을 하나씩 더해 가며 나눠 재기로 했습니다. 하락은 외국인 재계약 칸에서 났고, 원인은 재계약 판단이 투수를 실제보다 약 12런 낮게 봐서 투수만 떨어지는 것이었습니다 (남는 비율 타자 56%, 투수 21%). 외국인 타자가 늘자 장타 압력이 문턱을 넘고, 미래 규칙이 공을 죽여 타율이 내려간 연쇄였습니다. 고침: 투수 판단 영점 +5런, 타자 문턱 43 → 48런. 남은 장타 압력은 신인 천장 배율을 <span class="ba">10 → 9.75</span>로 고쳐 맞췄습니다 (9.5는 20년 뒤 리그 기량이 −6.8%라 고르지 않음).</dd>
+      <dt class="r">결과</dt><dd>머무는 시즌 <span class="ba">→ 1.70</span>, 재계약 비율 48.1% (실제 약 50%). 장타 압력 <span class="ba">1.154 → 1.105 → 1.050</span> (문턱 1.07 안). 리그 타율 .2518 → .2550. 측정 도구 자체의 셈 빠짐도 찾아 고쳤습니다 (머무는 시즌 2.64가 다시 세니 1.69). 타율 .26대 복귀는 남은 과제로 적어 두었습니다.</dd>
+    </dl>
+  </article>
+
+  <article class="case">
+    <h3>⑥ 100시즌을 돌렸더니 380승 투수가 나왔다 (노화 곡선)</h3>
+    <div class="meta">2026-11 · 장기 밸런스</div>
+    <dl class="pdr">
+      <dt class="p">문제</dt><dd>100시즌 자동 평가에서 가상 투수 한 명이 통산 380승을 올렸습니다. 가상 선수가 거의 늙지 않아 통산 150승 투수가 100시즌에 24~43명 나왔습니다 (실제 기준 11.4명).</dd>
+      <dt class="d">결정</dt><dd>스타 선수의 나이별 WAR을 실제와 견줘 하락을 키웠습니다. 타자 −3런·투수 −3.5런부터, 투수는 28세부터 조금씩 떨어집니다. 대신 20년 뒤 리그 전체 기량이 시작값에서 크게 벗어나지 않는지를 같이 지켰습니다.</dd>
+      <dt class="r">결과</dt><dd>통산 150승 <span class="ba">23.3 → 10.7 → 6.7명</span> (100시즌 환산). 20시즌 뒤 상위 270명 기여는 시작값의 −2.2%. 처음에는 −16~−27%로 리그가 쪼그라들었습니다.</dd>
+    </dl>
+  </article>
+
+  <article class="case">
+    <h3>⑦ 측정은 판단을 대신하지 않는다: 이도류는 그대로, 구단 투표는 뺀다</h3>
+    <div class="meta">2026-11-04 · 11-12 · 재미 판단</div>
+    <dl class="pdr">
+      <dt class="p">문제</dt><dd>자동 평가는 이도류(투타 겸업) 선수가 100시즌에 33~74명으로 실제 기준(1~10명)보다 많다고 했습니다. 또 구단끼리 규칙 변경을 투표하는 "단장 회의"를 손보는 기획 인터뷰를 했습니다.</dd>
+      <dt class="d">결정</dt><dd>이도류는 기준 밖이어도 <b>재미로 그대로</b> 두었습니다. 단장 회의는 개편안(Q5~20)까지 정한 뒤 다시 보고 <b>기능 자체를 빼고 리그가 결정</b>하는 방식으로 바꿨습니다. 이어서 이름만 있고 효과가 작은 기능을 정리하는 인터뷰에서 효과가 미미한 이벤트 58종은 선택지 없이 소식으로만 내리고, 남는 선택지는 차이가 0.3승 또는 5억 원 이상이 되게 키우기로 했습니다.</dd>
+      <dt class="r">결과</dt><dd>예전 저장은 호환을 유지하면서 화면·진행에서 단장 회의를 껐습니다. 점수가 낮은 항목을 다 고치지 않고, 낮은 항목 20개를 다음 작업 목록으로 쓰는 방식이 자리 잡았습니다.</dd>
+    </dl>
+  </article>
+  <p class="note">사례 수치 출처: 이전 포트폴리오(2026-11-10, main 9e4484d)와 저장소 보고서, <code>결정기록.md</code>. 장기 측정은 시드 3~4개 값이라 운의 폭이 있습니다. 2026-11-12 이후 결정(⑦의 단장 회의·이벤트 정리)은 기획이 정해진 상태이고 구현 여부는 이 문서에서 확인하지 않았습니다.</p>
+</section>
+
+<!-- 3 제작 방식 -->
+<section id="org">
+  <h2><span class="no">3</span>제작 방식: AI 조직을 설계하고 운영했다</h2>
+  <p class="sub">여러 AI 세션을 병렬로 돌리는 도구(Orca) 위에 회사처럼 역할을 나눴습니다. 사람은 저 한 명이고, 저는 결정과 검수만 합니다.</p>
+
+  <div class="card org">
+    <svg viewBox="0 0 900 380" role="img" aria-labelledby="orgT orgD">
+      <title id="orgT">AI 작업 조직도</title>
+      <desc id="orgD">사용자가 결정을 내리고, 코디네이터 AI가 일을 나눠 기획 세션, 개발 사원, Codex 아트·간단 개발, Gemini 조사·검수에게 카드로 맡긴다. 합침과 시험, 토큰 측정은 스크립트가 한다.</desc>
+      <rect class="bx hu" x="320" y="12" width="260" height="62" rx="10"/>
+      <text class="t" x="450" y="38" text-anchor="middle">나 (사용자)</text>
+      <text class="s" x="450" y="60" text-anchor="middle">방향 · 규칙 · 결정 · 플레이 검수</text>
+      <path class="ln" d="M450 74 V112"/>
+      <rect class="bx boss" x="290" y="112" width="320" height="66" rx="10"/>
+      <text class="t" x="450" y="139" text-anchor="middle">코디네이터 AI "클사장" (Claude)</text>
+      <text class="s" x="450" y="161" text-anchor="middle">관리만: 일 나누기 · 카드 · 결과 확인 · 병합 · 보고</text>
+      <path class="ln" d="M450 178 V206 M115 206 H785 M115 206 V232 M335 206 V232 M565 206 V232 M785 206 V232"/>
+      <rect class="bx" x="20" y="232" width="190" height="82" rx="10"/>
+      <text class="t" x="115" y="258" text-anchor="middle">기획 세션</text>
+      <text class="s" x="115" y="280" text-anchor="middle">Claude · 기획안·카드 묶음</text>
+      <text class="s" x="115" y="298" text-anchor="middle">막힌 카드 다시 쪼개기</text>
+      <rect class="bx" x="240" y="232" width="190" height="82" rx="10"/>
+      <text class="t" x="335" y="258" text-anchor="middle">개발 사원</text>
+      <text class="s" x="335" y="280" text-anchor="middle">Claude · 카드 1장 = 세션 1개</text>
+      <text class="s" x="335" y="298" text-anchor="middle">코드 · 시험 · 측정</text>
+      <rect class="bx" x="470" y="232" width="190" height="82" rx="10"/>
+      <text class="t" x="565" y="258" text-anchor="middle">Codex</text>
+      <text class="s" x="565" y="280" text-anchor="middle">UI 이미지 시안</text>
+      <text class="s" x="565" y="298" text-anchor="middle">짧고 단순한 개발</text>
+      <rect class="bx" x="690" y="232" width="190" height="82" rx="10"/>
+      <text class="t" x="785" y="258" text-anchor="middle">Gemini</text>
+      <text class="s" x="785" y="280" text-anchor="middle">사실 검수</text>
+      <text class="s" x="785" y="298" text-anchor="middle">단순 기획 · 문서 정리</text>
+      <rect class="bx sc" x="170" y="334" width="560" height="38" rx="8"/>
+      <text class="s" x="450" y="358" text-anchor="middle">스크립트 (토큰 0): 보고 받기 · 합침+시험 · 무거운 명령 줄 세우기 · 토큰 측정</text>
+    </svg>
+  </div>
+
+  <div class="split" style="margin-top:14px">
+    <div class="card">
+      <b>일하는 단위</b>
+      <ul class="tight">
+        <li><b>카드 한 장 = AI 세션 하나.</b> 카드에 범위, 고칠 파일, 금지, 시험, 보고 양식을 적어 AI가 파일을 뒤지며 토큰을 쓰지 않게 했습니다.</li>
+        <li>결정이 필요하면 "원인 + 선택지 ①②③ + 추천" 형식으로 올라오고, 저는 <b>한 번에 하나씩</b> 고릅니다. 기획 질문은 인터뷰 형식으로 라운드마다 묶어 받습니다.</li>
+        <li>기획이 끝난 범위는 허락 없이 개발을 이어 가고, 새 기능·main 병합(배포)·삭제만 저에게 묻게 했습니다.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <b>숫자로 정한 운영 규칙</b>
+      <ul class="tight">
+        <li>토큰을 세션별로 재는 스크립트를 만들게 해서 봤더니, 하루 Claude 사용량 약 11억 3천만 토큰 중 <b>99%가 캐시 읽기</b>였습니다. 오래 붙어 있는 세션이 문제였습니다.</li>
+        <li>그래서 상주 세션은 코디네이터 하나만 두고, 직원은 일이 끝나면 닫고, 맥락이 커지면 교대하며, 5분마다 오던 "살아 있음" 신호를 금지했습니다.</li>
+        <li>모델은 일의 성격으로 나눴습니다: 판단·설계는 Claude Opus, 중간 크기는 Sonnet, 짧은 개발은 Codex, 단순 기획·조사는 Gemini.</li>
+        <li>PC가 느려진다는 이유로 무거운 시험은 한 번에 하나씩 줄 세우고, 카드 중에는 빠른 시험(약 1분)만, 전체 시험은 병합 전에만 돌리게 했습니다.</li>
+      </ul>
+    </div>
+  </div>
+  <p class="note">조직 구성은 2026-10-15~16에 여러 번 고쳤습니다 (부서장 세션을 두는 v2 → 상주 세션을 하나로 줄인 v3.1). 토큰 수치는 2026-10-15에 Orca 운영 전체(같은 시기 다른 프로젝트 포함)를 잰 값이고, 여기서 정한 규칙을 퍼펙트 매니지먼트 제작에도 썼습니다.</p>
+</section>
+
+<!-- 4 QA -->
+<section id="qa">
+  <h2><span class="no">4</span>QA: 재현할 수 있게 만들고, 케이스로 적는다</h2>
+  <p class="sub">"재현되지 않는 버그는 고칠 수 없다"를 처음부터 설계 조건으로 삼았습니다.</p>
+
+  <div class="grid g3">
+    <div class="card"><b>결정적 엔진</b><p>난수는 시드에서만 나오고 시각·<code>Math.random</code>을 쓰지 않습니다. 같은 시드·조작이면 끊김 없이 돌린 판, 저장 후 이어 돌린 판, 조작 기록을 다시 재생한 판의 결과가 같습니다.</p></div>
+    <div class="card"><b>재현 정보 한 줄</b><p>조건·위치·에디터 사용 표시·조작 기록·데이터 지문을 한 줄로 복사할 수 있습니다. 화면 오류가 나도 이 줄을 복사하고 시작 화면으로 나갈 수 있습니다.</p></div>
+    <div class="card"><b>버그 보고 예</b><p>"창단이 있는 해의 오프시즌 화면이 하얗게 된다" (치명). 재현: 2012 시작 → 시즌 끝 → FA "다음" 한 번. 원인: 끝난 시즌은 8구단, 리그 상태는 9구단. 회귀 시험을 더했습니다.</p></div>
+  </div>
+
+  <h3>테스트 케이스 문서</h3>
+  <p><a href="../퍼펙트매니지먼트_TC.xlsx"><b>퍼펙트매니지먼트_TC.xlsx</b></a> · 기준 origin/main <code>f69fca6</code> · 작성 2026-11-25. 구현된 기능만 TC로 쓰고, 기획만 있는 기능 22개는 "미구현·예정" 시트에 따로 두었습니다. 각 TC에 근거 파일 경로(기획 문서·화면 코드·자동 시험 이름)를 달았습니다.</p>
+
+  <div class="grid g4">
+    <div class="card stat"><div class="n">217</div><div class="l">TC</div><div class="d">기능 영역 19개</div></div>
+    <div class="card stat"><div class="n">48 · 96 · 73</div><div class="l">우선순위 P1 · P2 · P3</div><div class="d">P1 = 출시 전 반드시 통과</div></div>
+    <div class="card stat"><div class="n">51 · 37</div><div class="l">경계값 · 예외</div><div class="d">기능 93, UI 21, 회귀 15</div></div>
+    <div class="card stat"><div class="n">22</div><div class="l">미구현·예정</div><div class="d">별도 시트</div></div>
+  </div>
+
+  <h3>기능 영역별 TC 수</h3>
+  <div class="tablewrap">
+    <table>
+      <thead><tr><th>ID</th><th>기능 영역</th><th class="num">P1</th><th class="num">P2</th><th class="num">P3</th><th class="num">합계</th></tr></thead>
+      <tbody>
+        <tr><td>PM-OFF</td><td>오프시즌</td><td class="num">9</td><td class="num">9</td><td class="num">5</td><td class="num"><b>23</b></td></tr>
+        <tr><td>PM-ROS</td><td>선수단·엔트리·기용</td><td class="num">6</td><td class="num">10</td><td class="num">3</td><td class="num"><b>19</b></td></tr>
+        <tr><td>PM-TRD</td><td>트레이드</td><td class="num">6</td><td class="num">8</td><td class="num">3</td><td class="num"><b>17</b></td></tr>
+        <tr><td>PM-FIN</td><td>재정·연봉·샐러리캡</td><td class="num">0</td><td class="num">7</td><td class="num">10</td><td class="num"><b>17</b></td></tr>
+        <tr><td>PM-GAM</td><td>경기 엔진·일정</td><td class="num">2</td><td class="num">6</td><td class="num">8</td><td class="num"><b>16</b></td></tr>
+        <tr><td>PM-SAV</td><td>저장·불러오기·재현</td><td class="num">6</td><td class="num">7</td><td class="num">2</td><td class="num"><b>15</b></td></tr>
+        <tr><td>PM-UIX</td><td>화면 공통·메뉴</td><td class="num">0</td><td class="num">5</td><td class="num">7</td><td class="num"><b>12</b></td></tr>
+        <tr><td>PM-ADV</td><td>진행·멈춤·이벤트</td><td class="num">2</td><td class="num">8</td><td class="num">1</td><td class="num"><b>11</b></td></tr>
+        <tr><td>PM-CMD</td><td>직접 지휘</td><td class="num">3</td><td class="num">4</td><td class="num">4</td><td class="num"><b>11</b></td></tr>
+        <tr><td>PM-PST</td><td>가을야구·시상·칭호</td><td class="num">1</td><td class="num">5</td><td class="num">5</td><td class="num"><b>11</b></td></tr>
+        <tr><td>PM-MKT</td><td>시장·외국인·스카우트</td><td class="num">1</td><td class="num">7</td><td class="num">2</td><td class="num"><b>10</b></td></tr>
+        <tr><td>PM-REC</td><td>기록·아카이브·검색</td><td class="num">0</td><td class="num">3</td><td class="num">6</td><td class="num"><b>9</b></td></tr>
+        <tr><td>PM-STA</td><td>시작·새 게임</td><td class="num">2</td><td class="num">3</td><td class="num">3</td><td class="num"><b>8</b></td></tr>
+        <tr><td>PM-EDT</td><td>에디터 모드</td><td class="num">2</td><td class="num">3</td><td class="num">3</td><td class="num"><b>8</b></td></tr>
+        <tr><td>PM-OWN</td><td>구단주·난이도·도전</td><td class="num">2</td><td class="num">1</td><td class="num">4</td><td class="num"><b>7</b></td></tr>
+        <tr><td>PM-DEV</td><td>성장·훈련·병역</td><td class="num">0</td><td class="num">4</td><td class="num">3</td><td class="num"><b>7</b></td></tr>
+        <tr><td>PM-POL</td><td>숨김 값·실존 선수 규칙</td><td class="num">4</td><td class="num">1</td><td class="num">1</td><td class="num"><b>6</b></td></tr>
+        <tr><td>PM-FAN</td><td>판타지 모드</td><td class="num">2</td><td class="num">3</td><td class="num">0</td><td class="num"><b>5</b></td></tr>
+        <tr><td>PM-RUL</td><td>리그 규칙·시대</td><td class="num">0</td><td class="num">2</td><td class="num">3</td><td class="num"><b>5</b></td></tr>
+        <tr><th></th><th>합계</th><th class="num">48</th><th class="num">96</th><th class="num">73</th><th class="num">217</th></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>대표 TC 4개</h3>
+  <div class="tablewrap">
+    <table>
+      <thead><tr><th>ID · 유형</th><th>항목</th><th>절차 · 데이터</th><th>기대 결과</th></tr></thead>
+      <tbody>
+        <tr><td class="id"><b>PM-STA-004</b><br><span class="chip green">기능</span> <span class="chip">P1</span></td><td>같은 연도·구단·시드·난이도면 같은 결과</td><td>2026 LG, 시드 <code>abc</code>, 보통으로 시작해 일주일 진행 후 순위 기록 → 같은 조건으로 다시 시작해 일주일 진행</td><td>두 번의 순위·경기 결과·박스스코어가 완전히 같다 (버그 보고 재현의 기반)</td></tr>
+        <tr><td class="id"><b>PM-TRD-010</b><br><span class="chip">경계값</span> <span class="chip">P1</span></td><td>트레이드 마감 다음 날 거절</td><td>마감일(7월 31일) 다음 날 트레이드를 제안</td><td>"선수 등록 마감(7월 31일)이 지났습니다" 문구로 받지 않는다. 마감 당일은 된다</td></tr>
+        <tr><td class="id"><b>PM-TRD-009</b><br><span class="chip red">예외</span> <span class="chip">P1</span></td><td>외국인 선수 트레이드 불가</td><td>우리 외국인 선수를 넣어 제안 → 상대 요구안에 외국인이 있는지 확인</td><td>규정 위반으로 거절되고, 상대 요구안에도 외국인이 없다</td></tr>
+        <tr><td class="id"><b>PM-SAV-009</b><br><span class="chip red">예외</span> <span class="chip">P2</span></td><td>데이터가 바뀐 뒤 저장 (지문 불일치)</td><td>데이터 갱신 전 저장 파일을 갱신 뒤 불러옴</td><td>"게임 데이터가 저장할 때와 달라 이 저장을 이어갈 수 없습니다 (선수 구성이 바뀜)" 오류가 보인다</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="note">엑셀의 '결과' 열은 Pass / Fail / Block / N/A 목록으로 비워 두었습니다 (수행 기록은 아직 없음). 엔진 수치 밸런스(리그 평균 대조)는 자동 검증 스크립트 영역이라 TC에서 뺐습니다.</p>
+</section>
+
+<!-- 5 링크 -->
+<section id="links">
+  <h2><span class="no">5</span>링크</h2>
+  <div class="tablewrap">
+    <table>
+      <tbody>
+        <tr><th>소스 저장소</th><td><a href="https://github.com/malyee52/kbo-gm">github.com/malyee52/kbo-gm</a></td></tr>
+        <tr><th>플레이 (웹)</th><td><a href="https://malyee52.github.io/kbo-gm/">malyee52.github.io/kbo-gm</a></td></tr>
+        <tr><th>테스트 케이스</th><td><a href="../퍼펙트매니지먼트_TC.xlsx">퍼펙트매니지먼트_TC.xlsx</a> (포트폴리오 폴더)</td></tr>
+        <tr><th>더 긴 자료</th><td>요약 PPT 25장, 상세 기획서 53쪽 (규칙·수식·조정값·실패 기록). 요청 시 PDF로 드립니다.</td></tr>
+        <tr><th>이메일</th><td><a href="mailto:ararp25@gmail.com">ararp25@gmail.com</a></td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+
+</main>
+<footer>
+  <div class="wrap">퍼펙트 매니지먼트는 KBO 및 각 구단과 관련이 없는 비영리 팬 프로젝트입니다. 기록 출처와 라이선스는 저장소의 README와 DATA_LICENSES.md에 있습니다.<br>이 문서는 AI 기획 직원이 저장소·보고서에서 수치를 모아 초안을 쓰고 제가 확인했습니다. 이 페이지에 나온 다른 게임 이름은 플레이 기록 표기용이며 각 권리자의 상표입니다. 기준 2026-11-25.</div>
+</footer>
+<script src="../assets/site.js"></script>
+</body>
+</html>
